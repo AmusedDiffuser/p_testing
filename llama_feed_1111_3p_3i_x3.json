@@ -1,0 +1,135 @@
+{
+  "prompt1": "{{local.message1}}",
+  "prompt2": "{{local.message2}}",
+  "prompt3": "{{local.message3}}",
+  "run": [{
+    "method": "set",
+    "params": {
+      "local": {
+        "counter": 0
+      }
+    }
+  }, {
+    "uri": "https://github.com/malfunctionize/llama.git/index.js",
+    "method": "run",
+    "params": {
+      "message": {
+        "p": "### Instruction:\n\nWrite a detailed description of a beautiful scene with dynamic lighting and an interesting composition. Use descriptive language and mention the overal atmosphere and emotion that the image evokes.\n\n### Response\n\n",
+        "m": "../models/stable-vicuna/13b_q4_0.bin",
+        "n": 256
+      }
+    },
+    "queue": true,
+    "returns": "local.message1"
+  }, {
+    "method": "set",
+    "params": {
+      "self": {
+        "db.json": {
+          "items": "{{self.db && self.db.items ? self.db.items.concat(local.message1) : [local.message] }}"
+        }
+      }
+    }
+  }, {
+    "uri": "https://github.com/malfunctionize/llama.git/index.js",
+    "method": "run",
+    "params": {
+      "message": {
+        "p": "### Instruction:\n\nWrite a detailed description of a beautiful scene with dynamic lighting and an interesting composition. Use descriptive language and mention the overal atmosphere and emotion that the image evokes.\n\n### Response\n\n",
+        "m": "../models/stable-vicuna/13b_q4_0.bin",
+        "n": 256
+      }
+    },
+    "queue": true,
+    "returns": "local.message2"
+  }, {
+    "method": "set",
+    "params": {
+      "self": {
+        "db.json": {
+          "items": "{{self.db && self.db.items ? self.db.items.concat(local.message2) : [local.message] }}"
+        }
+      }
+    }
+  }, {
+    "uri": "https://github.com/malfunctionize/llama.git/index.js",
+    "method": "run",
+    "params": {
+      "message": {
+        "p": "### Instruction:\n\nWrite a detailed description of a beautiful scene with dynamic lighting and an interesting composition. Use descriptive language and mention the overal atmosphere and emotion that the image evokes.\n\n### Response\n\n",
+        "m": "../models/stable-vicuna/13b_q4_0.bin",
+        "n": 256
+      }
+    },
+    "queue": true,
+    "returns": "local.message3"
+  }, {
+    "method": "set",
+    "params": {
+      "self": {
+        "db.json": {
+          "items": "{{self.db && self.db.items ? self.db.items.concat(local.message3) : [local.message] }}"
+        }
+      }
+    }
+  }, {
+      "uri": "https://github.com/malfunctionize/automatic1111.git/index.js",
+      "method": "run",
+      "params": {
+        "cfg_scale": 7,
+        "steps": 20,
+        "prompt": "{{self.prompt1}}"
+      }
+    },
+    {
+      "method": "fs.write",
+      "params": {
+        "path": "images/{{Date.now()}}.png",
+        "buffer": "{{Buffer.from(input.images[0], 'base64')}}"
+      }
+    }, {
+      "uri": "https://github.com/malfunctionize/automatic1111.git/index.js",
+      "method": "run",
+      "params": {
+        "cfg_scale": 7,
+        "steps": 20,
+        "prompt": "{{self.prompt2}}"
+      }
+    },
+    {
+      "method": "fs.write",
+      "params": {
+        "path": "images/{{Date.now()}}.png",
+        "buffer": "{{Buffer.from(input.images[0], 'base64')}}"
+      }
+    }, {
+      "uri": "https://github.com/malfunctionize/automatic1111.git/index.js",
+      "method": "run",
+      "params": {
+        "cfg_scale": 7,
+        "steps": 20,
+        "prompt": "{{self.prompt3}}"
+      }
+    },
+    {
+      "method": "fs.write",
+      "params": {
+        "path": "images/{{Date.now()}}.png",
+        "buffer": "{{Buffer.from(input.images[0], 'base64')}}"
+      }
+    }, {
+    "method": "set",
+    "params": {
+      "local": {
+        "counter": "{{local.counter+1}}"
+      }
+    }
+  }, {
+    "method": "goto",
+    "params": {
+      "index": "{{ local.counter > 2 ? null : 1 }}"
+
+      }
+    }
+  ]
+}
